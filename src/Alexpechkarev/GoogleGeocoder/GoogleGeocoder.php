@@ -62,30 +62,20 @@ class GoogleGeocoder {
 
 
     /**
-     * Make cURL call
+     * Get json from url
      * @return string
      * @throws \RuntimeException
      */
     protected function call()
     {
-        $curl = curl_init();
+        $json = file_get_contents($this->requestUrl[$this->format].$this->param);
+        $obj = json_decode($json);
 
-        curl_setopt_array($curl, array(
-            CURLOPT_RETURNTRANSFER      => 1,
-            CURLOPT_URL                 => $this->requestUrl[$this->format].$this->param,
-            CURLOPT_SSL_VERIFYPEER      => false,
-            CURLOPT_FAILONERROR         => true,
-        ));
-
-        $request = curl_exec($curl);
-
-        if (empty($request)) {
-            throw new \RuntimeException('cURL request retuened following error: '.curl_error($curl) );
+        if (!isset($obj->results[0])) {
+            throw new \RuntimeException('Can\'t get geolocation.');
         }
 
-        curl_close($curl);
-
-        return $request;
+        return $obj->results[0];
     }
 
 
